@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  laravel-app:
+    build:
+      context: ./devops-register-appLayer
+      dockerfile: Dockerfile
+    container_name: laravel-app
+    volumes:
+      - ./devops-register-appLayer:/var/www/html
+    ports:
+      - "8000:9000"
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: newsDb
+      DB_USERNAME: root
+      DB_PASSWORD: secretnewsDb
+
+  db:
+    image: mariadb:10.6
+    container_name: db
+    environment:
+      MYSQL_ROOT_PASSWORD: secretnewsDb
+      MYSQL_DATABASE: newsDb
+      MYSQL_USER: root
+      MYSQL_PASSWORD: secretnewsDb
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  nextjs-app:
+    build:
+      context: ./devops-registration-weblayer
+      dockerfile: Dockerfile
+    container_name: nextjs-app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - laravel-app
+
+volumes:
+  db_data:
+
+
